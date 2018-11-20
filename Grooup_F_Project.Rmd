@@ -1,0 +1,77 @@
+---
+title: "Group_F_Project"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# knitr settings to control how R chunks work and how the pdf is compiled when knit.
+library(knitr)
+require(knitr)
+library(leaps) 
+library(car)
+library(formatR)
+library(dplyr)
+library(ggplot2)
+library(mosaic)
+library(broom)
+library(modelr)
+opts_chunk$set(
+  tidy=TRUE,                     # display code as typed
+  size="small",                   # slightly smaller font for code
+  tidy.opts=list(width.cutoff=80), # wrap text and long comments
+  fig.width=5, fig.height=3           #figure size
+)
+#Requiring Stat2Data package for the data
+require(Stat2Data)
+require(mosaic)
+require(dplyr)
+```
+
+```{r}
+#Read-in the csv file
+insurance <- read_csv("group-F-data.csv")
+
+#Remove all null values
+insurance <- insurance%>%
+na.omit()
+
+hist(insurance$charges)
+favstats((insurance$charges))
+```
+```{r}
+insurance %>% 
+  select(charges, children) %>%
+  cor()
+```
+```{r}
+chargesmod <- lm(charges~age+children+bmi+sex+smoker+region, data=insurance)
+summary(chargesmod)
+```
+
+```{r}
+#backward elimination 
+
+full <- lm(charges~., data=insurance)
+fullMSE<-(summary(full)$sigma)^2 
+step(full, data=insurance, scale=fullMSE, direction="backward")
+```
+
+```{r}
+#best subset regression 
+
+bestsubset <- regsubsets(charges~., data=insurance)
+with(summary(bestsubset), data.frame(adjr2, cp, rss, outmat))
+```
+```{r}
+#check for linearity 
+plot(chargesmod)
+```
+
+```{r}
+#best subset 
+bestcrgmod <- lm(charges~age+bmi+children+smoker+region, data=insurance)
+plot(bestcrgmod)
+```
+
