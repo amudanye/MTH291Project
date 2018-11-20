@@ -46,7 +46,7 @@ insurance %>%
   cor()
 ```
 ```{r}
-chargesmod <- lm(charges~age+children+bmi+sex+smoker+region, data=insurance)
+chargesmod <- lm(charges~age+children+bmi+sex+smoker+region, data=insurance) #Changed
 summary(chargesmod)
 ```
 
